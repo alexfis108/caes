@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PAE Huancavelica</title>
+  <style>
+    :root{
+      --verde:#0b6e4f; --verde-claro:#16a34a; --naranja:#f58220; --amarillo:#ffc20e;
+      --fondo:#eef2f5; --texto:#1e293b; --gris:#64748b; --borde:#e2e8f0; --rojo:#dc2626;
+      --wa:#25d366; --ambar:#b45309; --ambar-claro:#fef3c7;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--fondo);color:var(--texto);min-height:100vh}
+
+    header{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--verde),var(--verde-claro));color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+    .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.02rem}
+    .logo img{width:30px;height:30px;object-fit:contain;background:#fff;border-radius:50%;padding:2px}
+    .btn-personal{background:#fff;color:var(--verde);border:none;padding:8px 14px;border-radius:999px;font-weight:800;font-size:.78rem;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.18);white-space:nowrap}
+    .btn-personal:hover{background:#e6fbf4}
+
+    main{max-width:760px;margin:0 auto;padding:16px 14px 60px}
+    .tarjeta{background:#fff;border-radius:16px;box-shadow:0 4px 18px rgba(15,23,42,.08);padding:20px;margin-bottom:16px}
+    .titulo-seccion{font-size:1.08rem;margin-bottom:6px;color:var(--verde)}
+    .texto-ayuda{color:var(--gris);font-size:.9rem;margin-bottom:14px}
+
+    .hero{background:linear-gradient(135deg,var(--verde) 0%,var(--verde-claro) 60%,#19b285 100%);color:#fff;text-align:center;padding:18px 14px}
+    .hero h1{font-size:1.2rem}
+    .logo-hero{width:84px;height:84px;object-fit:contain;display:block;margin:0 auto 8px;background:#fff;border-radius:50%;padding:7px;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+    @media (max-width:420px){ .logo-hero{width:70px;height:70px} .hero h1{font-size:1.05rem} }
+
+    .formatos-botones{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:12px 18px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .12s,box-shadow .12s}
+    .btn:active{transform:scale(.97)}
+    .btn:hover{box-shadow:0 6px 16px rgba(0,0,0,.18)}
+    .btn-formato{flex:1;min-width:180px;color:#fff;padding:14px}
+    .btn-pdf{background:linear-gradient(135deg,#ef4444,#dc2626)}
+    .btn-word{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+    .btn-excel{background:linear-gradient(135deg,var(--verde-claro),var(--verde));color:#fff}
+
+    .busqueda-fila{display:flex;gap:10px}
+    .busqueda-fila input{flex:1;min-width:0;padding:13px 14px;border:2px solid #cbd5e1;border-radius:12px;font-size:1rem}
+    .busqueda-fila input:focus{outline:none;border-color:var(--verde-claro)}
+    .btn-buscar{padding:13px 20px;background:var(--verde);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:.95rem;cursor:pointer}
+    .btn-buscar:hover{background:var(--verde-claro)}
+
+    .titulo-resultados{margin:16px 0 2px;font-size:.85rem;color:var(--gris);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+    .item-resultado{border:2px solid var(--borde);border-radius:12px;padding:11px 13px;margin-top:10px;cursor:pointer;transition:border-color .15s,background .15s}
+    .item-resultado:hover{border-color:var(--verde-claro);background:#f0fdf9}
+    .item-resultado.seleccionado{border-color:var(--verde);background:#e7f9f1;box-shadow:0 0 0 3px rgba(18,138,107,.18)}
+    .item-resultado.cargada{border-color:#16a34a;background:#f0fdf4;cursor:not-allowed}
+    .item-resultado.cargada:hover{border-color:#16a34a;background:#f0fdf4}
+    .item-resultado.observada{border-color:#f59e0b;background:#fffbeb}
+    .item-resultado.observada:hover{border-color:#d97706;background:var(--ambar-claro)}
+    .item-resultado.observada.seleccionado{border-color:var(--ambar);background:#fde68a;box-shadow:0 0 0 3px rgba(180,83,9,.2)}
+    .item-nombre{font-weight:800;font-size:.97rem}
+    .item-detalle{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.83rem;color:var(--gris);margin-top:4px}
+    .acciones-resultado{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .nota-obs{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:8px;padding:7px 10px;font-size:.78rem;margin-top:8px;line-height:1.4}
+
+    #tarjetaIIEE{margin-top:16px;border:2px solid var(--verde);border-radius:14px;padding:16px;background:#f0fdf9}
+    #tarjetaIIEE h3{color:var(--verde);margin-bottom:8px;font-size:1.02rem}
+    .fila-dato{display:flex;justify-content:space-between;gap:12px;padding:7px 2px;border-bottom:1px dashed #cfe5dd;font-size:.92rem}
+    .fila-dato:last-child{border-bottom:none}
+    .fila-dato span{color:var(--gris)}
+    .fila-dato b{text-align:right}
+
+    .btn-cargar{display:block;width:100%;margin-top:18px;padding:16px;background:linear-gradient(135deg,#f97316,var(--naranja));color:#fff;font-size:1.12rem;font-weight:900;border:none;border-radius:14px;cursor:pointer;letter-spacing:.5px;animation:pulso 1.7s ease-in-out infinite}
+    .btn-cargar:hover{filter:brightness(1.05)}
+    @keyframes pulso{0%,100%{box-shadow:0 6px 18px rgba(234,88,12,.4);transform:scale(1)}50%{box-shadow:0 8px 30px rgba(234,88,12,.75);transform:scale(1.02)}}
+
+    .modal{position:fixed;inset:0;background:rgba(15,23,42,.62);display:flex;align-items:flex-start;justify-content:center;padding:16px;z-index:200;overflow-y:auto}
+    .modal-caja{background:#fff;border-radius:16px;max-width:540px;width:100%;margin:auto;padding:22px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+    /* Modal anidado (observación): se muestra ENCIMA de los modales principales,
+       pero debajo del overlay de carga (z-index:300) */
+     #modalObservar{z-index:250}
+    .cerrar{position:absolute;top:10px;right:12px;background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;color:var(--gris)}
+    .cerrar:hover{background:#e2e8f0;color:var(--texto)}
+    .modal-caja h2{color:var(--verde);font-size:1.15rem;margin-bottom:8px;padding-right:30px}
+    .info-iiee-modal{background:#e7f9f1;border:1px solid #a7e8d3;border-radius:10px;padding:10px 12px;font-size:.87rem;margin-bottom:6px}
+
+    label{display:block;font-weight:700;font-size:.83rem;margin:13px 0 5px;color:#334155}
+    input[type=text],input[type=tel],input[type=email],input[type=password],textarea{width:100%;padding:11px 12px;border:2px solid #cbd5e1;border-radius:10px;font-size:.95rem;font-family:inherit;resize:vertical}
+    input[type=text]:focus,input[type=tel]:focus,input[type=email]:focus,input[type=password]:focus,textarea:focus{outline:none;border-color:var(--verde-claro)}
+
+    .zona-archivo{border:2px dashed #cbd5e1;border-radius:12px;padding:18px 14px;text-align:center;cursor:pointer;color:var(--gris);background:#f8fafc;transition:all .15s}
+    .zona-archivo:hover,.zona-archivo.arrastrando{border-color:var(--naranja);background:#fff7ed}
+    .nota-archivo{font-size:.8rem;margin-top:6px}
+    .nombre-archivo{margin-top:8px;font-size:.86rem;color:var(--verde);font-weight:700;word-break:break-all}
+    .oculto-input{display:none}
+
+    .error-form{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 12px;margin-top:14px;font-size:.88rem}
+    .btn-enviar{width:100%;margin-top:18px;padding:14px;background:var(--verde);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:900;cursor:pointer}
+    .btn-enviar:hover:not(:disabled){background:var(--verde-claro)}
+    .btn-enviar:disabled{background:#94a3b8;cursor:not-allowed}
+
+    .check{font-size:3.2rem;text-align:center;margin-bottom:4px}
+    #seccionExito{text-align:center}
+    #seccionExito h2{color:var(--verde);margin-bottom:8px}
+    .resumen{text-align:left;background:#f8fafc;border:1px solid var(--borde);border-radius:12px;padding:12px 14px;margin:14px 0}
+    .nota-correo{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:10px;padding:10px;font-size:.88rem;margin:8px 0}
+    .botones-exito{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .botones-exito .btn{flex:1;min-width:200px;padding:13px}
+    .btn-cargo{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff}
+    .btn-secundario{background:#e2e8f0;color:var(--texto)}
+
+    .tarjeta-personal{background:linear-gradient(135deg,#f0fdf9,#e7f9f1);border:1px solid #a7e8d3;border-radius:12px;padding:16px;text-align:center;margin-bottom:14px}
+    .tarjeta-personal h3{color:var(--verde);margin-bottom:6px}
+    .chips-rutas{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+
+    .chip-estado{font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+    .chip-cargado{background:#DCFCE7;color:#166534}
+    .chip-pendiente{background:#FFEDD5;color:#9A3412}
+    .chip-obs{background:#FDE68A;color:#92400E}
+    .chip-ruta{font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap;background:#e0f2fe;color:#075985}
+    .chip-ruta-btn{border:2px solid var(--borde);background:#fff;color:#334155;border-radius:999px;padding:8px 16px;font-size:.82rem;font-weight:800;cursor:pointer;transition:all .15s}
+    .chip-ruta-btn:hover{border-color:var(--verde-claro);background:#f0fdf9}
+    .chip-ruta-btn.activo{background:linear-gradient(135deg,var(--verde),var(--verde-claro));color:#fff;border-color:var(--verde);box-shadow:0 3px 10px rgba(11,110,79,.3)}
+
+    .tarjetas-resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+    .tarjetas-resumen.cuatro{grid-template-columns:repeat(4,1fr)}
+    .tarjeta-resumen{border-radius:12px;padding:12px 6px;text-align:center;color:#fff}
+    .tr-total{background:linear-gradient(135deg,#0b6e4f,#16a34a)}
+    .tr-ok{background:linear-gradient(135deg,#16a34a,#22c55e)}
+    .tr-pend{background:linear-gradient(135deg,#f58220,#fb923c)}
+    .tr-obs{background:linear-gradient(135deg,#f59e0b,#d97706)}
+    .tarjeta-resumen .num{font-size:1.5rem;font-weight:900}
+    .tarjeta-resumen .etq{font-size:.66rem;opacity:.95;margin-top:2px;line-height:1.2}
+    @media (max-width:520px){ .tarjetas-resumen.cuatro{grid-template-columns:repeat(2,1fr)} }
+
+    .tabs{display:flex;gap:8px;margin:14px 0 10px;flex-wrap:wrap}
+    .tab{flex:1;border:none;border-radius:10px;padding:11px 8px;font-weight:800;font-size:.78rem;cursor:pointer;background:#e2e8f0;color:#475569;transition:all .15s;min-width:115px}
+    .tab-verde.activo{background:linear-gradient(135deg,#16a34a,#0b6e4f);color:#fff;box-shadow:0 4px 12px rgba(11,110,79,.35)}
+    .tab-naranja.activo{background:linear-gradient(135deg,#f58220,#ea580c);color:#fff;box-shadow:0 4px 12px rgba(234,88,12,.35)}
+    .tab-azul.activo{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(29,78,216,.35)}
+    .tab-ambar.activo{background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;box-shadow:0 4px 12px rgba(180,83,9,.35)}
+
+    .lista-iiee-personal .item-resultado{cursor:default}
+    .estado-ok{border-left:5px solid #16a34a}
+    .estado-pend{border-left:5px solid #f58220}
+    .estado-obs{border-left:5px solid #f59e0b}
+
+    .info-tramitador{background:#f0fdf9;border:1px dashed #a7e8d3;border-radius:10px;margin-top:8px;padding:8px 10px;font-size:.8rem;color:#334155;display:grid;gap:3px}
+    .info-tramitador .tit{font-size:.64rem;font-weight:800;color:var(--verde);text-transform:uppercase;letter-spacing:.4px}
+    .info-obs{background:#fffbeb;border:1px dashed #fde68a;border-radius:10px;margin-top:8px;padding:8px 10px;font-size:.8rem;color:#78350f;display:grid;gap:3px}
+    .info-obs .tit{font-size:.64rem;font-weight:800;color:var(--ambar);text-transform:uppercase;letter-spacing:.4px}
+    .botones-archivo{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .btn-mini{display:inline-flex;align-items:center;gap:4px;background:var(--verde);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:.76rem;font-weight:800;cursor:pointer;text-decoration:none}
+    .btn-mini:hover{filter:brightness(1.12)}
+    .btn-mini-desc{background:#2563eb}
+    .btn-wa{background:var(--wa)}
+    .btn-obs{background:var(--ambar)}
+    .btn-quitar-obs{background:#64748b}
+
+    .anillo{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:10px auto}
+    .anillo-interior{width:92px;height:92px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .contenedor-rutas{max-height:340px;overflow-y:auto;padding-right:6px;margin-top:8px}
+    .pista{height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+    .pista .lleno{height:100%;background:linear-gradient(90deg,#16a34a,#0b6e4f);border-radius:999px}
+
+    .info-pasos{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:10px;padding:8px 12px;font-size:.76rem;margin-bottom:10px;line-height:1.5}
+    .panel-iiees-ruta{border:1px solid var(--borde);border-radius:12px;padding:10px;background:#f8fafc;margin-top:10px}
+    .panel-cab{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:.82rem}
+    .check-iiee{display:flex;align-items:center;gap:8px;font-size:.8rem;padding:8px;border-radius:8px;background:#fff;border:1px solid var(--borde);cursor:pointer;margin-bottom:6px}
+    .check-iiee:hover{border-color:var(--verde-claro)}
+    .badge-asig{font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+    .badge-libre{background:#f1f5f9;color:#64748b}
+    .badge-otro{background:#FFEDD5;color:#9A3412}
+    .badge-mio{background:#DCFCE7;color:#166534}
+    .acciones-rutas{display:flex;gap:8px;margin:8px 0}
+
+    .fila-personal{border:2px solid var(--borde);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+    .fila-personal .nom{font-weight:800;font-size:.95rem;color:var(--texto)}
+    .fila-personal .dat{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.8rem;color:var(--gris);margin-top:5px}
+
+    .overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300;color:#fff;text-align:center;padding:24px}
+    .spinner{width:46px;height:46px;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:girar .8s linear infinite;margin-bottom:14px}
+    @keyframes girar{to{transform:rotate(360deg)}}
+    .aviso{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:400;background:var(--rojo);color:#fff;padding:12px 18px;border-radius:10px;max-width:92%;box-shadow:0 4px 14px rgba(0,0,0,.35);font-size:.9rem;text-align:center}
+    .aviso.ok{background:var(--verde)}
+
+    footer{text-align:center;color:var(--gris);font-size:.78rem;padding:10px}
+    .oculto{display:none!important}
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/alexfis108/imagenes/refs/heads/main/PAE.png" alt="PAE" onerror="this.style.display='none'">
+      <span>PAE Huancavelica</span>
+    </div>
+    <button id="btnPersonal" class="btn-personal">👤 PERSONAL PAE</button>
+  </header>
+
+  <main>
+    <section class="tarjeta hero">
+      <img src="https://raw.githubusercontent.com/alexfis108/imagenes/refs/heads/main/PAE.png" alt="Logotipo del PAE" class="logo-hero" onerror="this.style.display='none'">
+      <h1>Carga del Formato CAE de las II.EE.</h1>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="titulo-seccion">📄 Descargar Formato CAE</h2>
+      <div class="formatos-botones">
+        <a class="btn btn-formato btn-pdf" href="<?= CONFIG.URL_FORMATO_PDF ?>" target="_blank" rel="noopener">⬇️ Formato en PDF</a>
+        <a class="btn btn-formato btn-word" href="<?= CONFIG.URL_FORMATO_WORD ?>" target="_blank" rel="noopener">⬇️ Formato en Word</a>
+      </div>
+    </section>
+
+    <section class="tarjeta" id="busquedaCard">
+      <h2 class="titulo-seccion">🔎 Buscar Institución Educativa</h2>
+      <p class="texto-ayuda">Ingrese el <b>código modular</b> o el <b>nombre de la IIEE</b>:</p>
+      <div class="busqueda-fila">
+        <input type="text" id="txtBusqueda" placeholder="Ej.: 1234567 o Santa Rosa" autocomplete="off">
+        <button class="btn-buscar" id="btnBuscar">Buscar</button>
+      </div>
+      <div id="resultados" class="oculto"></div>
+      <div id="tarjetaIIEE" class="oculto"></div>
+      <button id="btnCargar" class="btn-cargar oculto">📤 CARGAR FORMATO CAE</button>
+    </section>
+
+    <section class="tarjeta oculto" id="seccionExito">
+      <div id="exitoContenido"></div>
+      <div class="botones-exito">
+        <button id="btnCargo" class="btn btn-cargo">🧾 Generar cargo de envío</button>
+        <button id="btnNuevaBusqueda" class="btn btn-secundario">🔍 Registrar otra IIEE</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>PAE — Programa de Alimentación Escolar · Unidad Territorial Huancavelica</footer>
+
+  <!-- MODAL: CARGA DE FORMATO -->
+  <div id="modalTramitador" class="modal oculto">
+    <div class="modal-caja">
+      <button class="cerrar" onclick="cerrarModal('modalTramitador')" title="Cerrar">✕</button>
+      <h2>📤 Cargar Formato CAE</h2>
+      <div class="info-iiee-modal" id="infoIIEEModal"></div>
+      <form id="formTramitador" novalidate>
+        <label for="txtApellidos">Apellidos y Nombres (*)</label>
+        <input type="text" id="txtApellidos" placeholder="Ej.: QUISPE HUAMÁN, Juan">
+        <label for="txtCelular">Celular (*)</label>
+        <input type="tel" id="txtCelular" placeholder="Ej.: 954123789">
+        <label for="txtCorreo">Correo electrónico (opcional)</label>
+        <input type="email" id="txtCorreo" placeholder="correo@ejemplo.com">
+        <label>Archivo del Formato CAE (*)</label>
+        <div class="zona-archivo" id="zonaArchivo">
+          <input type="file" id="filePdf" accept="application/pdf,.pdf" class="oculto-input">
+          <div>📄 <b>Arrastre su archivo aquí</b> o haga clic para seleccionarlo</div>
+          <div class="nota-archivo">⚠️ Solo archivos <b>PDF</b> · Tamaño máximo <b>10 MB</b></div>
+          <div class="nombre-archivo" id="infoArchivo"></div>
+        </div>
+        <div id="errorForm" class="error-form oculto"></div>
+        <button type="submit" id="btnEnviarForm" class="btn-enviar" disabled>✅ ENVIAR ARCHIVO</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: OBSERVAR FORMATO -->
+  <div id="modalObservar" class="modal oculto">
+    <div class="modal-caja" style="max-width:470px">
+      <button class="cerrar" onclick="cerrarModal('modalObservar')" title="Cerrar">✕</button>
+      <h2 style="color:var(--ambar)">⚠️ Observar Formato CAE</h2>
+      <div class="info-iiee-modal" id="infoIIEEObs" style="background:#fffbeb;border-color:#fde68a"></div>
+      <label for="txtComentarioObs">Motivo de la observación (opcional)</label>
+      <textarea id="txtComentarioObs" rows="3" placeholder="Ej.: El archivo no corresponde a la IIEE / Documento ilegible..."></textarea>
+      <p class="texto-ayuda" style="font-size:.76rem;margin-top:10px;line-height:1.5">Al confirmar: la IIEE pasará a estado <b>OBSERVADA</b>, se desbloqueará para que el tramitador pueda <b>volver a cargar</b> el formato desde la aplicación, y si el tramitador registró su correo se le enviará una <b>notificación automática</b>.</p>
+      <button id="btnConfirmarObs" class="btn-enviar" style="background:var(--ambar)">⚠️ CONFIRMAR OBSERVACIÓN</button>
+      <button class="btn btn-secundario" style="width:100%;margin-top:8px" onclick="cerrarModal('modalObservar')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL: PERSONAL PAE / ADMINISTRADOR -->
+  <div id="modalPersonal" class="modal oculto">
+    <div class="modal-caja" id="cajaPersonal">
+      <button class="cerrar" onclick="cerrarModal('modalPersonal')" title="Cerrar">✕</button>
+
+      <div id="pasoDni">
+        <h2>👤 Personal PAE</h2>
+        <p class="texto-ayuda">Ingrese su DNI para consultar las IIEE a su cargo:</p>
+        <label for="txtDNI">DNI</label>
+        <input type="text" id="txtDNI" inputmode="text" maxlength="20" placeholder="Ej.: 71234567" autocomplete="off">
+        <div id="errorDni" class="error-form oculto"></div>
+        <button id="btnConsultarDni" class="btn-enviar">Ingresar</button>
+      </div>
+
+      <div id="pasoClave" class="oculto">
+        <h2>🔒 Modo Administrador</h2>
+        <p class="texto-ayuda">Ingrese la contraseña de administrador:</p>
+        <label for="txtClave">Contraseña</label>
+        <input type="password" id="txtClave" placeholder="••••••••••••" autocomplete="off">
+        <div id="errorClave" class="error-form oculto"></div>
+        <button id="btnIngresarAdmin" class="btn-enviar">Ingresar</button>
+        <button class="btn btn-secundario" style="width:100%;margin-top:8px" onclick="volverDni()">↩ Volver</button>
+      </div>
+
+      <div id="pasoInfo" class="oculto"><div id="contenidoPersonal"></div></div>
+    </div>
+  </div>
+
+  <div id="overlayCargando" class="overlay oculto">
+    <div class="spinner"></div>
+    <div id="cargandoTexto">Procesando...</div>
+  </div>
+  <div id="aviso" class="aviso oculto"></div>
+
+  <script>
+    const URL_WEB_APP = '<?!= urlWebApp ?>';
+    const URL_SITIO = '<?!= urlSitio ?>';
+    const LOGO_URL = 'https://raw.githubusercontent.com/alexfis108/imagenes/refs/heads/main/PAE.png';
+    const $ = id => document.getElementById(id);
+
+    let iieeSeleccionada = null;
+    let resultadoCarga = null;
+    let listaResultados = [];
+    let claveAdmin = '';
+    let dniPersonalActual = '';
+    let datosPersonalActual = null;
+    let rutaSeleccionada = '';
+    let datosAsignacion = null;
+    let estadoAsignar = null;
+    let codObsPendiente = '';
+    let tabPersonalActiva = 'tCarg';
+
+    /* ---------- Utilidades ---------- */
+    function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+    function mostrarCargando(m){$('cargandoTexto').textContent=m||'Procesando...';$('overlayCargando').classList.remove('oculto');}
+    function ocultarCargando(){$('overlayCargando').classList.add('oculto');}
+    function mostrarAviso(m,tipo){const a=$('aviso');a.textContent=m;a.className='aviso '+(tipo||'');a.classList.remove('oculto');clearTimeout(a._t);a._t=setTimeout(()=>a.classList.add('oculto'),9000);}
+    function filaDato(et,va){return '<div class="fila-dato"><span>'+et+'</span><b>'+(esc(va)||'—')+'</b></div>';}
+    function cerrarModal(id){$(id).classList.add('oculto');}
+    function tarjetaResumen(etq,num,clase){return '<div class="tarjeta-resumen '+clase+'"><div class="num">'+num+'</div><div class="etq">'+etq+'</div></div>';}
+
+    function descargarBase64(base64,nombre,tipoMime){
+      const binario=atob(base64);
+      const bytes=new Uint8Array(binario.length);
+      for(let i=0;i<binario.length;i++)bytes[i]=binario.charCodeAt(i);
+      const blobUrl=URL.createObjectURL(new Blob([bytes],{type:tipoMime||'application/octet-stream'}));
+      const a=document.createElement('a');
+      a.href=blobUrl;
+      a.download=nombre||'archivo';
+      a.style.display='none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){a.remove();URL.revokeObjectURL(blobUrl);},15000);
+    }
+
+    function idDeUrl(url){
+      let m=/\/file\/d\/([-\w]+)/.exec(url||'');
+      if(m)return m[1];
+      m=/[?&]id=([-\w]+)/.exec(url||'');
+      if(m)return m[1];
+      m=/[-\w]{25,}/.exec(url||'');
+      return m?m[0]:'';
+    }
+    function urlDescarga(url){
+      const id=idDeUrl(url);
+      return id?('https://drive.google.com/uc?export=download&id='+id):(url||'#');
+    }
+
+    function urlWhatsApp(celular,mensaje){
+      let tel=String(celular||'').replace(/\D/g,'');
+      if(tel.length===9)tel='51'+tel;
+      else if(tel.length===10&&tel.charAt(0)==='0')tel='51'+tel.substring(1);
+      return 'https://wa.me/'+tel+'?text='+encodeURIComponent(mensaje||'');
+    }
+    // WhatsApp para IIEEs con formato cargado (búsqueda): coordinar con el personal PAE
+    function mensajeWhatsAppCargada(i){
+      return 'Hola '+(i.personalNombre||'')+', le contacto para coordinar respecto al Formato CAE de la IIEE '+
+        i.nombre+' (Cód. Modular: '+i.codMod+'), la cual ya cuenta con su formato cargado. Quedo atento(a) a su respuesta. Gracias — PAE Unidad Territorial Huancavelica.';
+    }
+    // WhatsApp para IIEEs OBSERVADAS: mensaje al TRAMITADOR con el enlace de re-carga
+    function mensajeObsWhatsApp(i){
+      const t=i.tramitador||{};
+      const o=i.observacion||{};
+      return 'Hola '+(t.apellidos||'')+', le informamos que el Formato CAE cargado correspondiente a la IIEE '+
+        i.nombre+' (Cód. Modular: '+i.codMod+') se encuentra OBSERVADO'+
+        (o.comentario?' por el siguiente motivo: '+o.comentario:'')+
+        '. Se requiere que revise y vuelva a cargar el formato a través del siguiente enlace: '+URL_SITIO+
+        '. Ante cualquier consulta puede comunicarse con '+(o.personal||'el personal PAE asignado')+
+        '. Gracias por su colaboración — PAE, Unidad Territorial Huancavelica.';
+    }
+
+    /* ---------- Búsqueda de IIEE ---------- */
+    function buscarIIEEs(){
+      const q=$('txtBusqueda').value.trim();
+      if(q.length<2){mostrarAviso('Ingrese al menos 2 caracteres para buscar.');return;}
+      $('resultados').classList.add('oculto');$('resultados').innerHTML='';
+      listaResultados=[];iieeSeleccionada=null;
+      $('tarjetaIIEE').classList.add('oculto');$('btnCargar').classList.add('oculto');
+      mostrarCargando('Buscando instituciones educativas...');
+      google.script.run
+        .withSuccessHandler(function(res){ocultarCargando();pintarResultados(res);})
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error al buscar: '+e.message);})
+        .buscarIIEE(q);
+    }
+
+    function pintarResultados(res){
+      const cont=$('resultados');
+      const lista=(res&&res.lista)||[];
+      listaResultados=lista;
+      if(!lista.length){
+        cont.innerHTML='<p class="texto-ayuda" style="text-align:center;margin-top:14px">🔎 No se encontraron IIEE con el criterio ingresado.</p>';
+        cont.classList.remove('oculto');return;
+      }
+      const nCargadas=lista.filter(function(i){return i.cargado&&!i.observado;}).length;
+      const nObs=lista.filter(function(i){return i.observado;}).length;
+      let html='<div class="titulo-resultados">'+lista.length+' resultado(s)'+
+        ((res.total||0)>lista.length?' (de '+res.total+' en total, refine su búsqueda)':'')+
+        (nCargadas?' — 🔒 '+nCargadas+' ya cargada(s)':'')+
+        (nObs?' — ⚠️ '+nObs+' observada(s), pueden re-cargarse':'')+'</div>';
+
+      lista.forEach(function(i,idx){
+        if(i.cargado&&!i.observado){
+          // CARGADA Y NO OBSERVADA: bloqueada + WhatsApp al personal PAE
+          const acciones=(i.personalCelular)
+            ?'<div class="acciones-resultado"><a class="btn-mini btn-wa" href="'+esc(urlWhatsApp(i.personalCelular,mensajeWhatsAppCargada(i)))+'" target="_blank" rel="noopener">💬 Coordinar por WhatsApp</a></div>'
+            :'<div style="font-size:.74rem;color:#94a3b8;margin-top:5px">⚠️ Sin responsable PAE asignado para coordinar</div>';
+          html+='<div class="item-resultado cargada">'+
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+              '<div class="item-nombre" style="flex:1">🔒 '+esc(i.nombre)+'</div>'+
+              '<span class="chip-estado chip-cargado">📋 FORMATO YA CARGADO</span>'+
+            '</div>'+
+            '<div class="item-detalle"><span><b>Cód. Modular:</b> '+esc(i.codMod)+'</span><span><b>Nivel:</b> '+esc(i.nivel)+'</span></div>'+
+            '<div class="item-detalle"><span><b>Prov.:</b> '+esc(i.provincia)+'</span><span><b>Dist.:</b> '+esc(i.distrito)+'</span></div>'+
+            (i.personalNombre?'<div class="item-detalle"><span>👤 Responsable PAE: <b>'+esc(i.personalNombre)+'</b></span></div>':'')+
+            '<div style="font-size:.74rem;color:#166534;margin-top:5px">✔ Esta IIEE ya cargó su Formato CAE; no se permite cargarlo nuevamente.</div>'+
+            acciones+
+          '</div>';
+        }else if(i.observado){
+          // OBSERVADA: desbloqueada para re-carga
+          html+='<div class="item-resultado observada" data-i="'+idx+'">'+
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+              '<div class="item-nombre" style="flex:1">⚠️ '+esc(i.nombre)+'</div>'+
+              '<span class="chip-estado chip-obs">⚠️ OBSERVADO</span>'+
+            '</div>'+
+            '<div class="item-detalle"><span><b>Cód. Modular:</b> '+esc(i.codMod)+'</span><span><b>Nivel:</b> '+esc(i.nivel)+'</span></div>'+
+            '<div class="item-detalle"><span><b>Prov.:</b> '+esc(i.provincia)+'</span><span><b>Dist.:</b> '+esc(i.distrito)+'</span></div>'+
+            '<div class="nota-obs">⚠️ El formato cargado fue <b>OBSERVADO</b>'+
+              (i.observacionComentario?' — Motivo: '+esc(i.observacionComentario):'')+
+              '. Seleccione esta IIEE para <b>volver a cargar</b> el Formato CAE.</div>'+
+          '</div>';
+        }else{
+          // PENDIENTE: seleccionable normalmente
+          html+='<div class="item-resultado" data-i="'+idx+'">'+
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+              '<div class="item-nombre" style="flex:1">'+esc(i.nombre)+'</div>'+
+              '<span class="chip-estado chip-pendiente">⏳ PENDIENTE</span>'+
+            '</div>'+
+            '<div class="item-detalle"><span><b>Cód. Modular:</b> '+esc(i.codMod)+'</span><span><b>Nivel:</b> '+esc(i.nivel)+'</span></div>'+
+            '<div class="item-detalle"><span><b>Prov.:</b> '+esc(i.provincia)+'</span><span><b>Dist.:</b> '+esc(i.distrito)+'</span></div>'+
+          '</div>';
+        }
+      });
+      cont.innerHTML=html;
+      cont.classList.remove('oculto');
+
+      Array.prototype.forEach.call(cont.querySelectorAll('.btn-wa'),function(b){
+        b.addEventListener('click',function(e){e.stopPropagation();});
+      });
+      // Solo las seleccionables (pendientes y observadas) reciben el evento
+      Array.prototype.forEach.call(cont.querySelectorAll('.item-resultado[data-i]'),function(el){
+        el.addEventListener('click',function(){seleccionarIIEE(parseInt(el.getAttribute('data-i'),10),el);});
+      });
+      if(lista.length===1 && (lista[0].observado || !lista[0].cargado)){
+        seleccionarIIEE(0,cont.querySelector('.item-resultado[data-i]'));
+      }
+    }
+
+    function seleccionarIIEE(idx,el){
+      const i=listaResultados[idx];
+      if(!i)return;
+      if(i.cargado&&!i.observado)return; // bloqueada
+      iieeSeleccionada=i;
+      Array.prototype.forEach.call(document.querySelectorAll('#resultados .item-resultado'),function(e){e.classList.remove('seleccionado');});
+      if(el)el.classList.add('seleccionado');
+      $('tarjetaIIEE').innerHTML='<h3>🏫 '+esc(i.nombre)+'</h3>'+
+        filaDato('Código Modular',i.codMod)+
+        filaDato('Nivel',i.nivel)+
+        filaDato('Provincia',i.provincia)+
+        filaDato('Distrito',i.distrito)+
+        filaDato('Centro Poblado',i.centroPoblado)+
+        (i.observado?'<div class="nota-obs">⚠️ El formato anterior fue <b>OBSERVADO</b>'+
+          (i.observacionComentario?' — Motivo: '+esc(i.observacionComentario):'')+
+          '. Por favor <b>vuelva a cargar</b> el Formato CAE.</div>':'')+
+        '<div style="text-align:center;margin-top:10px;font-size:.85rem;color:#0b5e4b;font-weight:700">✔ Institución seleccionada</div>';
+      $('tarjetaIIEE').classList.remove('oculto');
+      $('btnCargar').classList.remove('oculto');
+      $('btnCargar').scrollIntoView({behavior:'smooth',block:'center'});
+    }
+
+    /* ---------- Modal de carga ---------- */
+    function abrirModalTramitador(){
+      if(!iieeSeleccionada)return;
+      $('infoIIEEModal').innerHTML='<b>'+esc(iieeSeleccionada.nombre)+'</b><br>Cód. Modular: '+
+        esc(iieeSeleccionada.codMod)+' · Nivel: '+esc(iieeSeleccionada.nivel)+
+        (iieeSeleccionada.observado?'<br><span style="color:#92400e;font-weight:700">⚠️ Re-carga: el formato anterior fue observado</span>':'');
+      $('formTramitador').reset();
+      $('infoArchivo').textContent='';
+      $('errorForm').classList.add('oculto');
+      $('btnEnviarForm').disabled=true;
+      $('modalTramitador').classList.remove('oculto');
+      setTimeout(function(){$('txtApellidos').focus();},80);
+    }
+
+    function actualizarInfoArchivo(){
+      const f=$('filePdf').files[0];
+      if(f){
+        $('infoArchivo').textContent='✅ '+f.name+' ('+(f.size/1048576).toFixed(2)+' MB)';
+        $('btnEnviarForm').disabled=false;
+      }else{
+        $('infoArchivo').textContent='';
+        $('btnEnviarForm').disabled=true;
+      }
+    }
+
+    async function enviarFormulario(e){
+      e.preventDefault();
+      const err=$('errorForm');
+      err.classList.add('oculto');
+      const apellidos=$('txtApellidos').value.trim();
+      const celular=$('txtCelular').value.trim();
+      const correo=$('txtCorreo').value.trim();
+      const archivo=$('filePdf').files[0];
+      function mal(m){err.textContent=m;err.classList.remove('oculto');err.scrollIntoView({behavior:'smooth',block:'center'});}
+
+      if(apellidos.length<3)return mal('Ingrese sus apellidos y nombres.');
+      if(!/^[0-9+()\- ]{6,15}$/.test(celular))return mal('Ingrese un número de celular válido (ej.: 954123789).');
+      if(correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo))return mal('El correo electrónico no es válido.');
+      if(!archivo)return mal('Seleccione el archivo PDF del Formato CAE.');
+      if(archivo.type!=='application/pdf' && !/\.pdf$/i.test(archivo.name))return mal('Solo se pueden cargar archivos PDF.');
+      if(archivo.size>10*1024*1024)return mal('El archivo supera el máximo de 10 MB (pesa '+(archivo.size/1048576).toFixed(2)+' MB).');
+
+      const datos={codMod:iieeSeleccionada.codMod,nombre:iieeSeleccionada.nombre,apellidos:apellidos,celular:celular,correo:correo};
+
+      $('btnEnviarForm').disabled=true;
+      mostrarCargando('Subiendo archivo... no cierre ni recargue la página. Esto puede tardar unos segundos.');
+      try{
+        let resp=null;
+        if(URL_WEB_APP){
+          try{
+            resp=await subirConFetch(archivo,datos);
+            if(resp&&resp.ok===false&&/no se recibió ningún archivo|solicitud no válida/i.test(resp.mensaje||'')){
+              resp=null;
+            }
+          }catch(e1){resp=null;}
+        }
+        if(!resp){
+          mostrarCargando('Subiendo archivo (modo compatible)... no cierre ni recargue la página.');
+          resp=await subirConBase64(archivo,datos);
+        }
+        if(!resp||!resp.ok)throw new Error((resp&&resp.mensaje)||'No se pudo subir el archivo.');
+        resultadoCarga=resp;
+        cerrarModal('modalTramitador');
+        mostrarExito(resp);
+      }catch(e2){
+        err.textContent=e2.message||'Error inesperado al subir el archivo.';
+        err.classList.remove('oculto');
+      }finally{
+        $('btnEnviarForm').disabled=false;
+        ocultarCargando();
+      }
+    }
+
+    async function subirConFetch(archivo,datos){
+      const fd=new FormData();
+      fd.append('archivo',archivo,archivo.name);
+      fd.append('datos',JSON.stringify(datos));
+      const r=await fetch(URL_WEB_APP,{method:'POST',body:fd});
+      const texto=await r.text();
+      return JSON.parse(texto);
+    }
+
+    function subirConBase64(archivo,datos){
+      return new Promise(function(resolve,reject){
+        const lector=new FileReader();
+        lector.onload=function(){
+          const base64=String(lector.result).split(',')[1]||'';
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            .subirArchivoBase64(base64,archivo.name,archivo.type,datos);
+        };
+        lector.onerror=function(){reject(new Error('No se pudo leer el archivo.'));};
+        lector.readAsDataURL(archivo);
+      });
+    }
+
+    /* ---------- Confirmación y cargo ---------- */
+    function mostrarExito(resp){
+      const i=resp.iiee||{},t=resp.tramitador||{};
+      $('exitoContenido').innerHTML=
+        '<div class="check">✅</div>'+
+        '<h2>¡Carga realizada con éxito!</h2>'+
+        '<p class="texto-ayuda">El archivo <b>'+esc(resp.archivo)+'</b> se registró y guardó correctamente.</p>'+
+        '<div class="resumen">'+
+          filaDato('Tramitador',t.apellidos)+filaDato('Celular',t.celular)+
+          filaDato('IIEE',i.nombre)+filaDato('Código Modular',i.codMod)+
+          filaDato('Nivel',i.nivel)+
+          filaDato('Fecha y hora',resp.fechaCarga)+
+        '</div>'+
+        (resp.resubida?'<p class="nota-correo" style="background:#fffbeb;border-color:#fde68a;color:#92400e">⚠️ Re-carga registrada: la observación anterior fue <b>cerrada</b> y la IIEE vuelve al estado CON FORMATO.</p>':'')+
+        (resp.correoEnviado?'<p class="nota-correo">📧 Se envió un correo de confirmación a <b>'+esc(t.correo)+'</b>.</p>':'');
+      $('busquedaCard').classList.add('oculto');
+      $('seccionExito').classList.remove('oculto');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function generarCargoEnvio(){
+      if(!resultadoCarga)return;
+      mostrarCargando('Generando cargo de envío...');
+      const info={
+        apellidos:resultadoCarga.tramitador.apellidos,
+        celular:resultadoCarga.tramitador.celular,
+        correo:resultadoCarga.tramitador.correo,
+        nombre:resultadoCarga.iiee.nombre,
+        codMod:resultadoCarga.iiee.codMod,
+        nivel:resultadoCarga.iiee.nivel,
+        provincia:resultadoCarga.iiee.provincia,
+        distrito:resultadoCarga.iiee.distrito,
+        centroPoblado:resultadoCarga.iiee.centroPoblado,
+        archivo:resultadoCarga.archivo,
+        fechaCarga:resultadoCarga.fechaCarga
+      };
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){descargarBase64(res.base64,res.nombre,'application/pdf');mostrarAviso('Cargo de envío generado y descargado.','ok');}
+          else mostrarAviso((res&&res.mensaje)||'No se pudo generar el cargo.');
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error al generar el cargo: '+e.message);})
+        .generarCargo(info);
+    }
+
+    function nuevaBusqueda(){
+      resultadoCarga=null;iieeSeleccionada=null;listaResultados=[];
+      $('seccionExito').classList.add('oculto');$('exitoContenido').innerHTML='';
+      $('busquedaCard').classList.remove('oculto');
+      $('resultados').classList.add('oculto');$('resultados').innerHTML='';
+      $('tarjetaIIEE').classList.add('oculto');$('tarjetaIIEE').innerHTML='';
+      $('btnCargar').classList.add('oculto');
+      $('txtBusqueda').value='';$('txtBusqueda').focus();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    /* ---------- Personal PAE / Administrador ---------- */
+    function abrirModalPersonal(){
+      $('cajaPersonal').classList.remove('grande');
+      $('pasoDni').classList.remove('oculto');
+      $('pasoClave').classList.add('oculto');
+      $('pasoInfo').classList.add('oculto');
+      $('contenidoPersonal').innerHTML='';
+      $('txtDNI').value='';$('txtClave').value='';
+      $('errorDni').classList.add('oculto');
+      $('errorClave').classList.add('oculto');
+      claveAdmin='';dniPersonalActual='';datosPersonalActual=null;rutaSeleccionada='';datosAsignacion=null;estadoAsignar=null;tabPersonalActiva='tCarg';
+      $('modalPersonal').classList.remove('oculto');
+      setTimeout(function(){$('txtDNI').focus();},80);
+    }
+
+    function consultarPersonal(){
+      const val=$('txtDNI').value.trim();
+      const err=$('errorDni');
+      err.classList.add('oculto');
+      if(val.toLowerCase()==='administrador'){
+        $('pasoDni').classList.add('oculto');
+        $('pasoClave').classList.remove('oculto');
+        setTimeout(function(){$('txtClave').focus();},80);
+        return;
+      }
+      if(!/^\d{6,12}$/.test(val)){err.textContent='Ingrese un DNI válido (solo números).';err.classList.remove('oculto');return;}
+      mostrarCargando('Consultando información...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok)pintarPersonal(res);
+          else{err.textContent=(res&&res.mensaje)||'No se encontró el DNI.';err.classList.remove('oculto');}
+        })
+        .withFailureHandler(function(e){ocultarCargando();err.textContent='Error: '+e.message;err.classList.remove('oculto');})
+        .buscarPersonal(val);
+    }
+
+    function ingresarAdmin(){
+      const clave=$('txtClave').value;
+      const err=$('errorClave');
+      err.classList.add('oculto');
+      if(!clave){err.textContent='Ingrese la contraseña.';err.classList.remove('oculto');return;}
+      claveAdmin=clave;
+      mostrarCargando('Validando y generando tablero...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok)pintarAdmin(res);
+          else{err.textContent=(res&&res.mensaje)||'Contraseña incorrecta.';err.classList.remove('oculto');}
+        })
+        .withFailureHandler(function(e){ocultarCargando();err.textContent='Error: '+e.message;err.classList.remove('oculto');})
+        .obtenerDatosAdmin(clave);
+    }
+
+    function listaItems(lista,tipo){
+      return '<div class="lista-iiee-personal">'+lista.map(function(i){
+        let extra='';
+        const t=i.tramitador;
+        const bloqTram='<div class="info-tramitador">'+
+          '<div class="tit">Tramitador que cargó el formato</div>'+
+          (t&&t.apellidos?'<div>👤 <b>'+esc(t.apellidos)+'</b></div>':'<div>👤 Sin datos registrados</div>')+
+          (t&&t.celular?'<div>📱 '+esc(t.celular)+'</div>':'')+
+          (t&&t.correo?'<div>✉️ '+esc(t.correo)+'</div>':'')+
+          (t&&t.fecha?'<div>🕒 Carga: '+esc(t.fecha)+'</div>':'')+
+        '</div>';
+        const botonesArchivo=(i.archivoUrl?
+          '<a class="btn-mini" href="'+esc(i.archivoUrl)+'" target="_blank" rel="noopener">👁 Ver archivo</a>'+
+          '<a class="btn-mini btn-mini-desc" href="'+esc(urlDescarga(i.archivoUrl))+'" target="_blank" rel="noopener">⬇️ Descargar</a>'
+          :'<span style="font-size:.74rem;color:#94a3b8;align-self:center">📎 Archivo sin enlace</span>');
+
+        if(tipo==='ok'){
+          extra=bloqTram+
+            '<div class="botones-archivo">'+botonesArchivo+
+              '<button type="button" class="btn-mini btn-obs" data-cod="'+esc(i.codMod)+'">⚠️ Observar formato</button>'+
+            '</div>';
+        }else if(tipo==='obs'){
+          const o=i.observacion||{};
+          extra='<div class="info-obs">'+
+            '<div class="tit">Observación registrada</div>'+
+            (o.fecha?'<div>🕒 '+esc(o.fecha)+'</div>':'')+
+            (o.personal?'<div>👤 Observado por: <b>'+esc(o.personal)+'</b></div>':'')+
+            (o.celularPersonal?'<div>📱 '+esc(o.celularPersonal)+'</div>':'')+
+            (o.comentario?'<div>📝 Motivo: '+esc(o.comentario)+'</div>':'<div style="color:#a16207">Sin motivo registrado</div>')+
+            '<div style="font-size:.72rem;color:#a16207;margin-top:2px">La IIEE está desbloqueada para que el tramitador vuelva a cargar el formato.</div>'+
+          '</div>'+
+          bloqTram+
+          '<div class="botones-archivo">'+
+            (t&&t.celular
+              ?'<a class="btn-mini btn-wa" href="'+esc(urlWhatsApp(t.celular,mensajeObsWhatsApp(i)))+'" target="_blank" rel="noopener">💬 WhatsApp al tramitador</a>'
+              :'<span style="font-size:.74rem;color:#94a3b8;align-self:center">💬 Tramitador sin celular registrado</span>')+
+            botonesArchivo+
+            '<button type="button" class="btn-mini btn-quitar-obs" data-cod="'+esc(i.codMod)+'">↩️ Quitar observación</button>'+
+          '</div>';
+        }
+
+        const chip=tipo==='ok'?'<span class="chip-estado chip-cargado">✓ CARGADO</span>'
+          :tipo==='obs'?'<span class="chip-estado chip-obs">⚠️ OBSERVADO</span>'
+          :'<span class="chip-estado chip-pendiente">⏳ PENDIENTE</span>';
+        const clase=tipo==='ok'?'estado-ok':tipo==='obs'?'estado-obs':'estado-pend';
+
+        return '<div class="item-resultado '+clase+'">'+
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+            '<div class="item-nombre" style="flex:1">'+esc(i.nombre)+'</div>'+
+            (i.codRuta?'<span class="chip-ruta">🛣️ '+esc(i.codRuta)+'</span>':'')+
+            chip+
+          '</div>'+
+          '<div class="item-detalle"><span>Cód. Modular: <b>'+esc(i.codMod)+'</b></span><span>Nivel: <b>'+esc(i.nivel)+'</b></span></div>'+
+          '<div class="item-detalle"><span>Distrito: <b>'+esc(i.distrito)+'</b></span><span>Centro Poblado: <b>'+esc(i.centroPoblado)+'</b></span></div>'+
+          extra+
+        '</div>';
+      }).join('')+'</div>';
+    }
+
+    function pintarPersonal(res){
+      $('cajaPersonal').classList.remove('grande');
+      dniPersonalActual=res.dni||'';
+      datosPersonalActual=res;
+      rutaSeleccionada=(res.rutas&&res.rutas.length)?res.rutas[0]:'';
+
+      let html=
+      '<div class="tarjeta-personal">'+
+        '<h3>👤 '+esc(res.apellidos)+'</h3>'+
+        '<div class="chips-rutas" id="chipsRutasSel" style="margin-top:10px"></div>'+
+      '</div>'+
+      '<div id="resumenRuta"></div>'+
+      '<div class="tabs">'+
+        '<button class="tab tab-verde'+(tabPersonalActiva==='tCarg'?' activo':'')+'" data-tab="tCarg" id="tabCarg">✅ Con formato</button>'+
+        '<button class="tab tab-ambar'+(tabPersonalActiva==='tObs'?' activo':'')+'" data-tab="tObs" id="tabObs">⚠️ Observadas</button>'+
+        '<button class="tab tab-naranja'+(tabPersonalActiva==='tPend'?' activo':'')+'" data-tab="tPend" id="tabPend">⏳ Sin formato</button>'+
+      '</div>'+
+      '<div id="tCarg"'+(tabPersonalActiva!=='tCarg'?' class="oculto"':'')+'></div>'+
+      '<div id="tObs"'+(tabPersonalActiva!=='tObs'?' class="oculto"':'')+'></div>'+
+      '<div id="tPend"'+(tabPersonalActiva!=='tPend'?' class="oculto"':'')+'></div>'+
+      '<button id="btnExcelRuta" class="btn btn-excel" style="width:100%;margin-top:14px">📊 Descargar reporte Excel (todas mis rutas)</button>'+
+      '<button class="btn btn-secundario" style="width:100%;margin-top:8px" onclick="volverDni()">↩ Ingresar otro DNI</button>';
+
+      $('contenidoPersonal').innerHTML=html;
+      $('pasoDni').classList.add('oculto');$('pasoClave').classList.add('oculto');
+      $('pasoInfo').classList.remove('oculto');
+
+      Array.prototype.forEach.call(document.querySelectorAll('#contenidoPersonal .tab[data-tab]'),function(t){
+        t.addEventListener('click',function(){
+          tabPersonalActiva=t.getAttribute('data-tab');
+          Array.prototype.forEach.call(document.querySelectorAll('#contenidoPersonal .tab[data-tab]'),function(x){x.classList.remove('activo');});
+          t.classList.add('activo');
+          ['tCarg','tObs','tPend'].forEach(function(id){$(id).classList.toggle('oculto',tabPersonalActiva!==id);});
+        });
+      });
+      $('btnExcelRuta').addEventListener('click',descargarReportePersonal);
+
+      pintarChipsRutas();
+      renderVistaRuta();
+    }
+
+    function pintarChipsRutas(){
+      const cont=$('chipsRutasSel');
+      if(!cont)return;
+      const rutas=(datosPersonalActual&&datosPersonalActual.rutas)||[];
+      if(rutas.length<=1){
+        cont.innerHTML=rutas.length?'<span class="chip-ruta" style="font-size:.82rem;padding:7px 14px">🛣️ Ruta '+esc(rutas[0])+'</span>':'';
+        return;
+      }
+      cont.innerHTML='<span style="font-size:.75rem;color:var(--gris);width:100%;text-align:center;margin-bottom:2px">Seleccione una ruta para ver solo sus IIEE:</span>'+
+        rutas.map(function(r){
+          return '<button type="button" class="chip-ruta-btn'+(r===rutaSeleccionada?' activo':'')+'" data-ruta="'+esc(r)+'">🛣️ '+esc(r)+'</button>';
+        }).join('');
+      Array.prototype.forEach.call(cont.querySelectorAll('.chip-ruta-btn'),function(b){
+        b.addEventListener('click',function(){
+          rutaSeleccionada=b.getAttribute('data-ruta');
+          pintarChipsRutas();
+          renderVistaRuta();
+        });
+      });
+    }
+
+    function renderVistaRuta(){
+      if(!datosPersonalActual)return;
+      const todas=datosPersonalActual.iiees||[];
+      const lista=rutaSeleccionada?todas.filter(function(i){return i.codRuta===rutaSeleccionada;}):todas;
+      const cargadas=lista.filter(function(i){return i.estado==='CARGADO';});
+      const observadas=lista.filter(function(i){return i.estado==='OBSERVADO';});
+      const pendientes=lista.filter(function(i){return i.estado==='PENDIENTE';});
+
+      $('resumenRuta').innerHTML=
+        '<div class="tarjetas-resumen cuatro">'+
+          tarjetaResumen('IIEE ASIGNADAS',lista.length,'tr-total')+
+          tarjetaResumen('CON FORMATO',cargadas.length,'tr-ok')+
+          tarjetaResumen('OBSERVADAS',observadas.length,'tr-obs')+
+          tarjetaResumen('SIN FORMATO',pendientes.length,'tr-pend')+
+        '</div>'+
+        (rutaSeleccionada&&((datosPersonalActual.rutas||[]).length>1)
+          ?'<p style="text-align:center;font-size:.8rem;color:var(--gris);margin:-4px 0 6px">Ruta seleccionada: <b>'+esc(rutaSeleccionada)+'</b></p>':'');
+
+      $('tabCarg').innerHTML='✅ Con formato ('+cargadas.length+')';
+      $('tabObs').innerHTML='⚠️ Observadas ('+observadas.length+')';
+      $('tabPend').innerHTML='⏳ Sin formato ('+pendientes.length+')';
+      $('tCarg').innerHTML=cargadas.length?listaItems(cargadas,'ok'):'<p class="texto-ayuda" style="text-align:center">No hay IIEE con formato cargado en esta ruta.</p>';
+      $('tObs').innerHTML=observadas.length?listaItems(observadas,'obs'):'<p class="texto-ayuda" style="text-align:center">No hay IIEE observadas en esta ruta. 🎉</p>';
+      $('tPend').innerHTML=pendientes.length?listaItems(pendientes,'pend'):'<p class="texto-ayuda" style="text-align:center">¡Excelente! Todas las IIEE de esta ruta tienen su formato cargado.</p>';
+
+      // Botones de OBSERVAR (pestaña Con formato)
+      Array.prototype.forEach.call(document.querySelectorAll('#tCarg .btn-obs'),function(b){
+        b.addEventListener('click',function(){abrirModalObservar(b.getAttribute('data-cod'));});
+      });
+      // Botones de QUITAR OBSERVACIÓN (pestaña Observadas)
+      Array.prototype.forEach.call(document.querySelectorAll('#tObs .btn-quitar-obs'),function(b){
+        b.addEventListener('click',function(){quitarObservacionCliente(b.getAttribute('data-cod'));});
+      });
+    }
+
+    /* ---------- Observación de formatos ---------- */
+    function abrirModalObservar(codMod){
+      if(!datosPersonalActual)return;
+      const i=datosPersonalActual.iiees.filter(function(x){return x.codMod===codMod;})[0];
+      if(!i)return;
+      codObsPendiente=codMod;
+      $('infoIIEEObs').innerHTML='<b>'+esc(i.nombre)+'</b><br>Cód. Modular: '+esc(i.codMod)+' · Nivel: '+esc(i.nivel)+' · Ruta: '+esc(i.codRuta||'—');
+      $('txtComentarioObs').value='';
+      $('modalObservar').classList.remove('oculto');
+      setTimeout(function(){$('txtComentarioObs').focus();},80);
+    }
+
+    function confirmarObservacion(){
+      if(!codObsPendiente)return;
+      const btn=$('btnConfirmarObs');
+      const comentario=$('txtComentarioObs').value.trim();
+      btn.disabled=true;
+      mostrarCargando('Registrando observación y notificando...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          btn.disabled=false;
+          if(res&&res.ok){
+            cerrarModal('modalObservar');
+            codObsPendiente='';
+            mostrarAviso(res.mensaje||'IIEE observada.','ok');
+            refrescarPersonal('tObs');
+          }else{
+            mostrarAviso((res&&res.mensaje)||'No se pudo registrar la observación.');
+          }
+        })
+        .withFailureHandler(function(e){ocultarCargando();btn.disabled=false;mostrarAviso('Error: '+e.message);})
+        .observarIIEE(dniPersonalActual,codObsPendiente,comentario);
+    }
+
+    function quitarObservacionCliente(codMod){
+      mostrarCargando('Quitando observación...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){
+            mostrarAviso(res.mensaje||'Observación retirada.','ok');
+            refrescarPersonal('tCarg');
+          }else{
+            mostrarAviso((res&&res.mensaje)||'No se pudo quitar la observación.');
+          }
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error: '+e.message);})
+        .quitarObservacion(dniPersonalActual,codMod);
+    }
+
+    function refrescarPersonal(tab){
+      if(tab)tabPersonalActiva=tab;
+      if(!dniPersonalActual)return;
+      mostrarCargando('Actualizando información...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok)pintarPersonal(res);
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error al actualizar: '+e.message);})
+        .buscarPersonal(dniPersonalActual);
+    }
+
+    /* ---------- Administrador ---------- */
+    function pintarAdmin(res){
+      $('cajaPersonal').classList.add('grande');
+      const pct=res.avance||0;
+      let html=
+      '<div style="text-align:center;margin-bottom:10px">'+
+        '<img src="'+LOGO_URL+'" alt="PAE" style="width:60px;height:60px;object-fit:contain;background:#fff;border-radius:50%;padding:4px" onerror="this.style.display=\'none\'">'+
+        '<h3 style="color:var(--verde);margin-top:6px">Tablero General — Carga del Formato CAE</h3>'+
+        '<p class="texto-ayuda" style="margin:2px 0 0">Unidad Territorial Huancavelica · Actualizado: '+esc(res.fecha||'')+'</p>'+
+      '</div>'+
+      '<div class="tarjetas-resumen cuatro">'+
+        tarjetaResumen('TOTAL DE IIEE',res.total,'tr-total')+
+        tarjetaResumen('CON FORMATO',res.cargadas,'tr-ok')+
+        tarjetaResumen('OBSERVADAS',res.observadas,'tr-obs')+
+        tarjetaResumen('SIN FORMATO',res.pendientes,'tr-pend')+
+      '</div>'+
+      '<div class="anillo" style="background:conic-gradient(#16a34a '+(pct*3.6)+'deg, #e2e8f0 0)">'+
+        '<div class="anillo-interior"><b style="font-size:1.3rem;color:var(--verde)">'+pct+'%</b><span style="font-size:.6rem;color:var(--gris)">AVANCE GENERAL</span></div>'+
+      '</div>'+
+      '<div class="tabs">'+
+        '<button class="tab tab-verde activo" data-atab="aPersonal">👥 Personal ('+(res.personal||[]).length+')</button>'+
+        '<button class="tab tab-naranja" data-atab="aCargadas">📋 IIEE cargadas ('+(res.cargadas+res.observadas)+')</button>'+
+        '<button class="tab tab-azul" data-atab="aAsignar">🔧 Asignar IIEEs</button>'+
+      '</div>'+
+      '<div id="aPersonal">'+listaPersonalAdmin(res.personal||[])+'</div>'+
+      '<div id="aCargadas" class="oculto">'+listaCargadasAdmin(res.cargadasDetalle||[])+'</div>'+
+      '<div id="aAsignar" class="oculto"></div>'+
+      '<button id="btnExcelAdmin" class="btn btn-excel" style="width:100%;margin-top:14px">📊 Descargar reporte general (por personal)</button>'+
+      '<button class="btn btn-secundario" style="width:100%;margin-top:8px" onclick="volverDni()">↩ Volver al inicio de sesión</button>';
+
+      $('contenidoPersonal').innerHTML=html;
+      $('pasoDni').classList.add('oculto');$('pasoClave').classList.add('oculto');
+      $('pasoInfo').classList.remove('oculto');
+      $('btnExcelAdmin').addEventListener('click',descargarReporteAdmin);
+
+      Array.prototype.forEach.call(document.querySelectorAll('.btn-reporte-personal'),function(b){
+        b.addEventListener('click',function(e){
+          e.stopPropagation();
+          descargarReportePersonalDe(b.getAttribute('data-dni'));
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll('#contenidoPersonal .tab[data-atab]'),function(t){
+        t.addEventListener('click',function(){
+          Array.prototype.forEach.call(document.querySelectorAll('#contenidoPersonal .tab[data-atab]'),function(x){x.classList.remove('activo');});
+          t.classList.add('activo');
+          const destino=t.getAttribute('data-atab');
+          ['aPersonal','aCargadas','aAsignar'].forEach(function(id){$(id).classList.toggle('oculto',destino!==id);});
+          if(destino==='aAsignar' && (!datosAsignacion || !$('aAsignar').innerHTML.trim())) cargarAsignacionRutas();
+        });
+      });
+    }
+
+    function listaPersonalAdmin(lista){
+      if(!lista||!lista.length) return '<p class="texto-ayuda" style="text-align:center">No hay personal registrado.</p>';
+      return '<div class="contenedor-rutas">'+lista.map(function(p){
+        const pct=p.total?Math.round(p.cargadas*100/p.total):0;
+        let colorBarra;
+        if(pct>=100)colorBarra='linear-gradient(90deg,#16a34a,#15803d)';
+        else if(pct>=70)colorBarra='linear-gradient(90deg,#eab308,#ca8a04)';
+        else if(pct>=50)colorBarra='linear-gradient(90deg,#f58220,#ea580c)';
+        else colorBarra='linear-gradient(90deg,#ef4444,#dc2626)';
+        return '<div class="fila-personal">'+
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+            '<div class="nom" style="flex:1">👤 '+esc(p.apellidos)+'</div>'+
+            '<button type="button" class="btn-mini btn-reporte-personal" data-dni="'+esc(p.dni)+'"'+(p.total?'':' disabled style="opacity:.5;cursor:not-allowed"')+'>📊 Reporte</button>'+
+          '</div>'+
+          '<div class="dat"><span>DNI: <b>'+esc(p.dni||'—')+'</b></span><span>Rutas: <b>'+esc((p.rutas||[]).join(', ')||'—')+'</b></span></div>'+
+          '<div class="dat">'+
+            '<span>Asignadas: <b>'+p.total+'</b></span>'+
+            '<span>Cargadas: <b style="color:#166534">'+p.cargadas+'</b></span>'+
+            '<span>Observadas: <b style="color:#92400e">'+p.observadas+'</b></span>'+
+            '<span>Faltantes: <b style="color:#9a3412">'+p.faltantes+'</b></span>'+
+            '<span>Avance: <b>'+pct+'%</b></span>'+
+          '</div>'+
+          '<div class="pista" style="margin-top:7px"><div class="lleno" style="width:'+pct+'%;background:'+colorBarra+'"></div></div>'+
+        '</div>';
+      }).join('')+'</div>';
+    }
+
+    function listaCargadasAdmin(detalle){
+      if(!detalle||!detalle.length) return '<p class="texto-ayuda" style="text-align:center">Aún no hay IIEE con formato cargado.</p>';
+      return '<div class="contenedor-rutas lista-iiee-personal" style="max-height:400px">'+detalle.map(function(d){
+        const esObs=d.estado==='OBSERVADO';
+        return '<div class="item-resultado '+(esObs?'estado-obs':'estado-ok')+'" style="cursor:default;padding:9px 12px">'+
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+            '<div class="item-nombre" style="flex:1">'+esc(d.nombre)+'</div>'+
+            (d.codRuta?'<span class="chip-ruta">🛣️ '+esc(d.ruta)+'</span>':'')+
+            (esObs?'<span class="chip-estado chip-obs">⚠️ OBSERVADA</span>':'<span class="chip-estado chip-cargado">✓ CARGADA</span>')+
+          '</div>'+
+          '<div class="item-detalle"><span>Cód. Modular: <b>'+esc(d.codMod)+'</b></span><span>Nivel: <b>'+esc(d.nivel)+'</b></span><span>Distrito: <b>'+esc(d.distrito)+'</b></span></div>'+
+          '<div class="item-detalle">'+
+            (d.tramitador?'<span>👤 '+esc(d.tramitador)+'</span>':'')+
+            (d.celular?'<span>📱 '+esc(d.celular)+'</span>':'')+
+            (d.fecha?'<span>🕒 '+esc(d.fecha)+'</span>':'')+
+          '</div>'+
+          (esObs&&d.comentario?'<div class="nota-obs">📝 Motivo: '+esc(d.comentario)+'</div>':'')+
+          (d.archivoUrl?'<div class="botones-archivo"><a class="btn-mini" href="'+esc(d.archivoUrl)+'" target="_blank" rel="noopener">📄 Ver / descargar archivo</a></div>':'')+
+        '</div>';
+      }).join('')+'</div>';
+    }
+
+    /* ---------- Asignación de IIEEs (Administrador) ---------- */
+    function cargarAsignacionRutas(mantenerSeleccion){
+      const idxPrev=(mantenerSeleccion&&$('selPersonal'))?parseInt($('selPersonal').value,10):null;
+      mostrarCargando('Cargando personal y rutas...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){
+            datosAsignacion=res;
+            pintarAsignacion();
+            if(idxPrev!==null&&!isNaN(idxPrev)&&idxPrev>=0&&idxPrev<res.personal.length){
+              $('selPersonal').value=String(idxPrev);
+              cambiarPersonalAsignar(idxPrev);
+            }
+          } else mostrarAviso((res&&res.mensaje)||'No se pudo cargar la información.');
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error: '+e.message);})
+        .obtenerPersonalYRutas(claveAdmin);
+    }
+
+    function pintarAsignacion(){
+      const res=datosAsignacion;
+      estadoAsignar={dni:'',rutas:{},rutaActiva:''};
+      let html=
+      '<div class="info-pasos"><b>Asignación de IIEEs:</b><br>1️⃣ Seleccione el personal · 2️⃣ Toque una ruta · 3️⃣ Marque las IIEE a asignar (si una IIEE pertenece a otro personal y la marca, <b>se reasignará</b>) · 4️⃣ Guarde los cambios.</div>'+
+      '<input type="text" id="filtroPersonal" placeholder="🔎 Filtrar por apellidos o DNI..." autocomplete="off" style="width:100%;padding:10px 12px;border:2px solid #cbd5e1;border-radius:10px;font-size:.92rem;margin-bottom:10px">'+
+      '<label for="selPersonal">Personal ('+res.personal.length+')</label>'+
+      '<select id="selPersonal" style="width:100%;padding:10px 12px;border:2px solid #cbd5e1;border-radius:10px;font-size:.92rem;background:#fff">'+
+        res.personal.map(function(p,idx){
+          return '<option value="'+idx+'">'+esc(p.apellidos)+(p.dni?' — DNI '+esc(p.dni):' — sin DNI')+(p.nIIEE?' ('+p.nIIEE+' IIEE)':'')+'</option>';
+        }).join('')+
+      '</select>'+
+      '<div id="infoAsignacion" class="info-tramitador" style="margin-top:10px"></div>'+
+      '<label style="margin-top:16px">Rutas — toque una para ver sus IIEE</label>'+
+      '<div class="chips-rutas" id="chipsRutasAsignar" style="justify-content:flex-start"></div>'+
+      '<div id="panelIIEEsRuta"></div>'+
+      '<button id="btnGuardarAsignacion" class="btn btn-excel" style="width:100%;margin-top:14px">💾 Guardar asignación de IIEEs</button>';
+
+      $('aAsignar').innerHTML=html;
+
+      $('selPersonal').addEventListener('change',function(){cambiarPersonalAsignar(parseInt(this.value,10));});
+      $('filtroPersonal').addEventListener('input',filtrarPersonal);
+      $('btnGuardarAsignacion').addEventListener('click',guardarAsignacionCliente);
+      cambiarPersonalAsignar(parseInt($('selPersonal').value,10));
+    }
+
+    function cambiarPersonalAsignar(idx){
+      const p=datosAsignacion.personal[idx];
+      if(!p)return;
+      estadoAsignar={dni:p.dni||'',rutas:{},rutaActiva:''};
+      $('infoAsignacion').innerHTML='<div class="tit">Asignación actual</div>'+
+        '<div>📌 IIEE asignadas: <b>'+p.nIIEE+'</b></div>'+
+        ((p.rutas&&p.rutas.length)?'<div>🛣️ Rutas: <b>'+esc(p.rutas.join(', '))+'</b></div>':'<div style="color:#94a3b8">Sin IIEE asignadas</div>');
+      pintarChipsRutasAsignar();
+      $('panelIIEEsRuta').innerHTML='';
+    }
+
+    function pintarChipsRutasAsignar(){
+      const cont=$('chipsRutasAsignar');
+      if(!cont)return;
+      cont.innerHTML=(datosAsignacion.rutas||[]).map(function(r){
+        return '<button type="button" class="chip-ruta-btn'+(estadoAsignar.rutaActiva===r.ruta?' activo':'')+'" data-ruta="'+esc(r.ruta)+'">'+esc(r.ruta)+(r.total?' <span style="opacity:.7">('+r.total+')</span>':'')+'</button>';
+      }).join('');
+      Array.prototype.forEach.call(cont.querySelectorAll('.chip-ruta-btn'),function(b){
+        b.addEventListener('click',function(){seleccionarRutaAsignar(b.getAttribute('data-ruta'));});
+      });
+    }
+
+    function seleccionarRutaAsignar(ruta){
+      estadoAsignar.rutaActiva=ruta;
+      pintarChipsRutasAsignar();
+      if(estadoAsignar.rutas[ruta]){pintarPanelRuta();return;}
+      if(!estadoAsignar.dni){mostrarAviso('Este personal no tiene DNI registrado; no se puede asignar IIEEs.');return;}
+      mostrarCargando('Cargando IIEE de la ruta '+ruta+'...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){
+            const checks={};
+            (res.iiees||[]).forEach(function(i){checks[i.codMod]=(i.asignadoDni===estadoAsignar.dni);});
+            estadoAsignar.rutas[ruta]={iiees:res.iiees||[],checks:checks};
+            pintarPanelRuta();
+          } else mostrarAviso((res&&res.mensaje)||'No se pudieron cargar las IIEE.');
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error: '+e.message);})
+        .obtenerIIEEsDeRutaParaAsignar(claveAdmin,ruta);
+    }
+
+    function pintarPanelRuta(){
+      const ruta=estadoAsignar.rutaActiva;
+      const est=estadoAsignar.rutas[ruta];
+      if(!est)return;
+      let nSel=0;
+      Object.keys(est.checks).forEach(function(c){if(est.checks[c])nSel++;});
+      let html='<div class="panel-iiees-ruta">'+
+        '<div class="panel-cab">'+
+          '<b style="color:var(--verde)">🛣️ Ruta '+esc(ruta)+' — '+est.iiees.length+' IIEE · seleccionadas: <span id="contSelIIEE">'+nSel+'</span></b>'+
+          '<div class="acciones-rutas" style="margin:0">'+
+            '<button type="button" class="btn-mini" id="btnTodasIIEE">✔ Todas</button>'+
+            '<button type="button" class="btn-mini btn-mini-desc" id="btnNingunaIIEE">✖ Ninguna</button>'+
+          '</div>'+
+        '</div>'+
+        est.iiees.map(function(i){
+          let badge;
+          if(i.asignadoDni===estadoAsignar.dni){
+            badge='<span class="badge-asig badge-mio">ASIGNADA A ESTE PERSONAL</span>';
+          }else if(i.asignadoA){
+            badge='<span class="badge-asig badge-otro">Asignada a: '+esc(i.asignadoA)+' — se reasignará</span>';
+          }else{
+            badge='<span class="badge-asig badge-libre">Sin asignar</span>';
+          }
+          return '<label class="check-iiee">'+
+            '<input type="checkbox" class="chkIIEE" data-cod="'+esc(i.codMod)+'"'+(est.checks[i.codMod]?' checked':'')+'>'+
+            '<span style="flex:1"><b>'+esc(i.nombre)+'</b><br>'+
+            '<span style="color:var(--gris);font-size:.72rem">Cód. Modular: '+esc(i.codMod)+' · Nivel: '+esc(i.nivel)+' · Distrito: '+esc(i.distrito)+'</span></span>'+
+            badge+
+          '</label>';
+        }).join('')+
+      '</div>';
+      $('panelIIEEsRuta').innerHTML=html;
+
+      $('btnTodasIIEE').addEventListener('click',function(){marcarTodasIIEEs(true);});
+      $('btnNingunaIIEE').addEventListener('click',function(){marcarTodasIIEEs(false);});
+      Array.prototype.forEach.call(document.querySelectorAll('.chkIIEE'),function(c){
+        c.addEventListener('change',function(){
+          est.checks[c.getAttribute('data-cod')]=c.checked;
+          actualizarContadorPanel();
+        });
+      });
+    }
+
+    function actualizarContadorPanel(){
+      const est=estadoAsignar.rutas[estadoAsignar.rutaActiva];
+      if(!est||!$('contSelIIEE'))return;
+      let n=0;
+      Object.keys(est.checks).forEach(function(c){if(est.checks[c])n++;});
+      $('contSelIIEE').textContent=n;
+    }
+
+    function marcarTodasIIEEs(estado){
+      const est=estadoAsignar.rutas[estadoAsignar.rutaActiva];
+      if(!est)return;
+      Object.keys(est.checks).forEach(function(c){est.checks[c]=estado;});
+      pintarPanelRuta();
+    }
+
+    function guardarAsignacionCliente(){
+      if(!estadoAsignar||!estadoAsignar.dni){mostrarAviso('Seleccione personal con DNI registrado.');return;}
+      const marcar=[],desmarcar=[];
+      Object.keys(estadoAsignar.rutas).forEach(function(ruta){
+        const est=estadoAsignar.rutas[ruta];
+        est.iiees.forEach(function(i){
+          if(est.checks[i.codMod])marcar.push(i.codMod);
+          else if(i.asignadoDni===estadoAsignar.dni)desmarcar.push(i.codMod);
+        });
+      });
+      if(!marcar.length&&!desmarcar.length){mostrarAviso('No hay cambios por guardar. Seleccione una ruta y marque las IIEE.');return;}
+      mostrarCargando('Guardando asignación de IEEs...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){
+            mostrarAviso(res.mensaje||'Asignación guardada.','ok');
+            cargarAsignacionRutas(true);
+          } else mostrarAviso((res&&res.mensaje)||'No se pudo guardar.');
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error: '+e.message);})
+        .guardarAsignacionIIEEs(claveAdmin,estadoAsignar.dni,marcar,desmarcar);
+    }
+
+    function filtrarPersonal(){
+      const q=$('filtroPersonal').value.trim().toLowerCase();
+      const sel=$('selPersonal');
+      Array.prototype.forEach.call(sel.options,function(o){
+        const p=datosAsignacion.personal[parseInt(o.value,10)];
+        o.style.display=(!q||(String(p.apellidos)+' '+String(p.dni)).toLowerCase().indexOf(q)!==-1)?'':'none';
+      });
+    }
+
+    /* ---------- Reportes Excel ---------- */
+    function descargarReportePersonal(){
+      if(!dniPersonalActual){mostrarAviso('No se pudo identificar el DNI consultado.');return;}
+      descargarReportePersonalDe(dniPersonalActual);
+    }
+
+    function descargarReportePersonalDe(dni){
+      if(!dni){mostrarAviso('Este personal no tiene DNI registrado.');return;}
+      mostrarCargando('Generando reporte Excel...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){descargarBase64(res.base64,res.nombre,'application/vnd.ms-excel');mostrarAviso('Reporte descargado.','ok');}
+          else mostrarAviso((res&&res.mensaje)||'No se pudo generar el reporte.');
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error: '+e.message);})
+        .generarReportePersonal(dni);
+    }
+
+    function descargarReporteAdmin(){
+      mostrarCargando('Generando reporte Excel...');
+      google.script.run
+        .withSuccessHandler(function(res){
+          ocultarCargando();
+          if(res&&res.ok){descargarBase64(res.base64,res.nombre,'application/vnd.ms-excel');mostrarAviso('Reporte descargado.','ok');}
+          else mostrarAviso((res&&res.mensaje)||'No se pudo generar el reporte.');
+        })
+        .withFailureHandler(function(e){ocultarCargando();mostrarAviso('Error: '+e.message);})
+        .generarReporteAdmin(claveAdmin);
+    }
+
+    function volverDni(){
+      $('cajaPersonal').classList.remove('grande');
+      $('pasoInfo').classList.add('oculto');
+      $('pasoClave').classList.add('oculto');
+      $('pasoDni').classList.remove('oculto');
+      $('txtDNI').value='';$('txtClave').value='';
+      $('errorDni').classList.add('oculto');$('errorClave').classList.add('oculto');
+      $('txtDNI').focus();
+    }
+
+    /* ---------- Conexión de eventos ---------- */
+    document.addEventListener('DOMContentLoaded',function(){
+      $('btnBuscar').addEventListener('click',buscarIIEEs);
+      $('txtBusqueda').addEventListener('keydown',function(e){if(e.key==='Enter')buscarIIEEs();});
+      $('btnCargar').addEventListener('click',abrirModalTramitador);
+      $('formTramitador').addEventListener('submit',enviarFormulario);
+      $('filePdf').addEventListener('change',actualizarInfoArchivo);
+      $('btnCargo').addEventListener('click',generarCargoEnvio);
+      $('btnNuevaBusqueda').addEventListener('click',nuevaBusqueda);
+      $('btnPersonal').addEventListener('click',abrirModalPersonal);
+      $('btnConsultarDni').addEventListener('click',consultarPersonal);
+      $('txtDNI').addEventListener('keydown',function(e){if(e.key==='Enter')consultarPersonal();});
+      $('btnIngresarAdmin').addEventListener('click',ingresarAdmin);
+      $('txtClave').addEventListener('keydown',function(e){if(e.key==='Enter')ingresarAdmin();});
+      $('btnConfirmarObs').addEventListener('click',confirmarObservacion);
+
+      ['modalTramitador','modalPersonal','modalObservar'].forEach(function(id){
+        $(id).addEventListener('click',function(e){if(e.target.id===id)cerrarModal(id);});
+      });
+
+      const zona=$('zonaArchivo');
+      zona.addEventListener('click',function(){$('filePdf').click();});
+      ['dragenter','dragover'].forEach(function(ev){zona.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();zona.classList.add('arrastrando');});});
+      ['dragleave','drop'].forEach(function(ev){zona.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();zona.classList.remove('arrastrando');});});
+      zona.addEventListener('drop',function(e){
+        if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length){
+          try{$('filePdf').files=e.dataTransfer.files;}
+          catch(_){try{const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);$('filePdf').files=dt.files;}catch(__){}}
+          actualizarInfoArchivo();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
